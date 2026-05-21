@@ -40,10 +40,13 @@ const krHolidays: Record<string, string> = {
   "2026-02-18": "설날 연휴",
   "2026-03-01": "삼일절",
   "2026-03-02": "대체공휴일",
+  "2026-05-01": "노동절",
   "2026-05-05": "어린이날",
   "2026-05-24": "부처님오신날",
   "2026-05-25": "대체공휴일",
+  "2026-06-03": "지방선거일",
   "2026-06-06": "현충일",
+  "2026-07-17": "제헌절",
   "2026-08-15": "광복절",
   "2026-08-17": "대체공휴일",
   "2026-09-24": "추석 연휴",
@@ -71,6 +74,10 @@ function toDateKey(year: number, monthIndex: number, day: number): string {
 }
 
 export function buildMonthCells(year: number, monthIndex: number, showKoreanHolidays: boolean): CalendarCell[] {
+  if (!Number.isInteger(monthIndex) || monthIndex < 0 || monthIndex > 11) {
+    throw new Error("Invalid month index");
+  }
+
   const first = new Date(Date.UTC(year, monthIndex, 1));
   const last = new Date(Date.UTC(year, monthIndex + 1, 0));
   const cells: CalendarCell[] = [];
@@ -91,7 +98,8 @@ export function buildMonthCells(year: number, monthIndex: number, showKoreanHoli
   }
 
   while (cells.length % 7 !== 0) {
-    cells.push({ isWeekend: false, badges: [] });
+    const weekDay = cells.length % 7;
+    cells.push({ isWeekend: weekDay === 0 || weekDay === 6, badges: [] });
   }
 
   return cells;
