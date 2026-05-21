@@ -53,6 +53,29 @@ export function findDueAlarms(tasks: Task[], now = new Date()): Task[] {
   });
 }
 
+export function markAlarmsFired(tasks: Task[], dueTasks: Task[], firedAt = new Date()): Task[] {
+  const dueIds = new Set(dueTasks.map((task) => task.id));
+  if (dueIds.size === 0) {
+    return tasks;
+  }
+
+  const firedAtIso = firedAt.toISOString();
+  return tasks.map((task) => {
+    if (!dueIds.has(task.id)) {
+      return task;
+    }
+
+    return {
+      ...task,
+      updatedAt: firedAtIso,
+      alarm: {
+        ...task.alarm,
+        lastFiredAt: firedAtIso,
+      },
+    };
+  });
+}
+
 export async function requestNotificationPermission(): Promise<NotificationPermission> {
   if (typeof Notification === "undefined") {
     return "denied";

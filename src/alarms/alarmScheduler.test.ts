@@ -1,6 +1,11 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Task } from "../domain/task";
-import { findDueAlarms, requestNotificationPermission, showTaskNotification } from "./alarmScheduler";
+import {
+  findDueAlarms,
+  markAlarmsFired,
+  requestNotificationPermission,
+  showTaskNotification,
+} from "./alarmScheduler";
 
 const baseTask: Task = {
   id: "task-1",
@@ -157,6 +162,24 @@ describe("findDueAlarms", () => {
     };
 
     expect(findDueAlarms([task], new Date("2026-05-21T18:01:00.000"))).toEqual([]);
+  });
+});
+
+describe("markAlarmsFired", () => {
+  it("updates lastFiredAt and updatedAt only for due tasks", () => {
+    const untouchedTask: Task = {
+      ...baseTask,
+      id: "task-2",
+      title: "Later task",
+      alarm: { ...baseTask.alarm, lastFiredAt: "2026-05-21T17:00:00.000Z" },
+    };
+    const firedAt = new Date("2026-05-21T18:00:30.000Z");
+
+    const result = markAlarmsFired([baseTask, untouchedTask], [baseTask], firedAt);
+
+    expect(result[0].alarm.lastFiredAt).toBe("2026-05-21T18:00:30.000Z");
+    expect(result[0].updatedAt).toBe("2026-05-21T18:00:30.000Z");
+    expect(result[1]).toBe(untouchedTask);
   });
 });
 

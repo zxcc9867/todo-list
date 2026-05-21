@@ -67,6 +67,11 @@ button:hover {
   border-color: var(--green);
 }
 
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
 .app-frame {
   display: grid;
   grid-template-columns: 220px minmax(0, 1fr);
@@ -180,6 +185,12 @@ button:hover {
 
 .calendar-header > div {
   margin-right: auto;
+}
+
+.calendar-header .month-controls {
+  display: inline-flex;
+  gap: 6px;
+  margin-right: 0;
 }
 
 .eyebrow {

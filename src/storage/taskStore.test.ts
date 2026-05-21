@@ -2,7 +2,8 @@ import { mkdtemp, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { beforeEach, describe, expect, it } from "vitest";
-import { addTaskToStore, defaultData, loadStore } from "./taskStore";
+import type { AppData } from "../domain/task";
+import { addTaskToStore, defaultData, loadStore, mergeAppData } from "./taskStore";
 
 const storageKey = "jini-tasks:data";
 
@@ -153,6 +154,52 @@ describe("taskStore", () => {
 
     expect(data.tasks[0].alarm.monthlyAnchorDay).toBe(31);
     expect(loadStore().tasks[0].alarm.monthlyAnchorDay).toBe(31);
+  });
+
+  it("merges CLI-only tasks and newer duplicates without replacing local settings", () => {
+    const localTask = validStoredTask({
+      id: "shared-task",
+      title: "Local title",
+      updatedAt: "2026-05-21T08:00:00.000Z",
+    }) as AppData["tasks"][number];
+    const olderServerDuplicate = validStoredTask({
+      id: "shared-task",
+      title: "Server title",
+      updatedAt: "2026-05-21T07:00:00.000Z",
+    }) as AppData["tasks"][number];
+    const cliOnlyTask = validStoredTask({
+      id: "cli-task",
+      title: "CLI task",
+      source: "codex",
+      updatedAt: "2026-05-21T09:00:00.000Z",
+    }) as AppData["tasks"][number];
+
+    const merged = mergeAppData(
+      {
+        tasks: [localTask],
+        settings: {
+          theme: "dark",
+          showKoreanHolidays: true,
+          notificationsEnabled: true,
+        },
+      },
+      {
+        tasks: [olderServerDuplicate, cliOnlyTask],
+        settings: {
+          theme: "light",
+          showKoreanHolidays: false,
+          notificationsEnabled: false,
+        },
+      },
+    );
+
+    expect(merged.settings).toEqual({
+      theme: "dark",
+      showKoreanHolidays: true,
+      notificationsEnabled: true,
+    });
+    expect(merged.tasks.map((task) => task.id)).toEqual(["cli-task", "shared-task"]);
+    expect(merged.tasks.find((task) => task.id === "shared-task")?.title).toBe("Local title");
   });
 });
 
