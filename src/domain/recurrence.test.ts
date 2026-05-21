@@ -38,6 +38,20 @@ describe("nextAlarmDate", () => {
     expect(nextAlarmDate("2026-03-31T09:00:00.000Z", "monthly")).toBe("2026-04-30T09:00:00.000Z");
   });
 
+  it("uses anchor day to recover from a clamped February 31 recurrence", () => {
+    const feb = nextAlarmDate("2026-01-31T09:00:00.000Z", "monthly", { anchorDay: 31 });
+
+    expect(feb).toBe("2026-02-28T09:00:00.000Z");
+    expect(nextAlarmDate(feb!, "monthly", { anchorDay: 31 })).toBe("2026-03-31T09:00:00.000Z");
+  });
+
+  it("uses anchor day to recover from a clamped February 30 recurrence", () => {
+    const feb = nextAlarmDate("2026-01-30T09:00:00.000Z", "monthly", { anchorDay: 30 });
+
+    expect(feb).toBe("2026-02-28T09:00:00.000Z");
+    expect(nextAlarmDate(feb!, "monthly", { anchorDay: 30 })).toBe("2026-03-30T09:00:00.000Z");
+  });
+
   it("treats until-completed as daily cadence", () => {
     expect(nextAlarmDate("2026-05-21T18:00:00.000Z", "until-completed")).toBe("2026-05-22T18:00:00.000Z");
   });
@@ -75,5 +89,13 @@ describe("combineDateAndTime", () => {
     const expected = new Date("2026-05-22T09:00:00").toISOString();
 
     expect(nextAlarmDate(alarm, "daily")).toBe(expected);
+  });
+
+  it("throws for invalid calendar dates", () => {
+    expect(() => combineDateAndTime("2026-02-31", "09:00")).toThrow("Invalid alarm date");
+  });
+
+  it("throws for invalid alarm times", () => {
+    expect(() => combineDateAndTime("2026-05-21", "24:00")).toThrow("Invalid alarm time");
   });
 });

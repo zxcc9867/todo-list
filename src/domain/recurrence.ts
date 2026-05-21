@@ -10,11 +10,15 @@ function daysInUtcMonth(year: number, month: number): number {
   return new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
 }
 
-function addMonthsClamped(date: Date, months: number): Date {
+type NextAlarmDateOptions = {
+  anchorDay?: number;
+};
+
+function addMonthsClamped(date: Date, months: number, anchorDay = date.getUTCDate()): Date {
   const targetMonthIndex = date.getUTCMonth() + months;
   const targetYear = date.getUTCFullYear() + Math.floor(targetMonthIndex / 12);
   const targetMonth = ((targetMonthIndex % 12) + 12) % 12;
-  const targetDay = Math.min(date.getUTCDate(), daysInUtcMonth(targetYear, targetMonth));
+  const targetDay = Math.min(anchorDay, daysInUtcMonth(targetYear, targetMonth));
 
   return new Date(
     Date.UTC(
@@ -29,7 +33,35 @@ function addMonthsClamped(date: Date, months: number): Date {
   );
 }
 
-export function nextAlarmDate(lastIso: string, repeat: RepeatRule): string | undefined {
+function validateDateInput(date: string): void {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
+  if (!match) {
+    throw new Error("Invalid alarm date");
+  }
+
+  const [, year, month, day] = match;
+  const parsed = new Date(`${date}T00:00:00`);
+  if (
+    Number.isNaN(parsed.getTime()) ||
+    parsed.getFullYear() !== Number(year) ||
+    parsed.getMonth() !== Number(month) - 1 ||
+    parsed.getDate() !== Number(day)
+  ) {
+    throw new Error("Invalid alarm date");
+  }
+}
+
+function validateTimeInput(time: string): void {
+  if (!/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(time)) {
+    throw new Error("Invalid alarm time");
+  }
+}
+
+export function nextAlarmDate(
+  lastIso: string,
+  repeat: RepeatRule,
+  options: NextAlarmDateOptions = {},
+): string | undefined {
   const last = new Date(lastIso);
 
   if (Number.isNaN(last.getTime())) {
@@ -56,9 +88,12 @@ export function nextAlarmDate(lastIso: string, repeat: RepeatRule): string | und
     return addDays(last, 7).toISOString();
   }
 
-  return addMonthsClamped(last, 1).toISOString();
+  return addMonthsClamped(last, 1, options.anchorDay).toISOString();
 }
 
 export function combineDateAndTime(date: string, time = "09:00"): string {
+  validateDateInput(date);
+  validateTimeInput(time);
+
   return new Date(`${date}T${time}:00`).toISOString();
 }
