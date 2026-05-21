@@ -12,7 +12,7 @@ export const defaultData: AppData = {
   tasks: [],
   settings: {
     theme: "system",
-    showKoreanHolidays: true,
+    showKoreanHolidays: false,
     notificationsEnabled: false,
   },
 };

@@ -39,6 +39,7 @@ describe("taskStore", () => {
 
   it("loads default data when storage is empty", () => {
     expect(loadStore()).toEqual(defaultData);
+    expect(loadStore().settings.showKoreanHolidays).toBe(false);
   });
 
   it("adds a validated task to storage", () => {
