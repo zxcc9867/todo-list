@@ -15,6 +15,7 @@ export interface AlarmSettings {
   time?: string;
   repeat: RepeatRule;
   advanceMinutes?: number;
+  monthlyAnchorDay?: number;
   lastFiredAt?: string;
   snoozeUntil?: string;
 }
@@ -50,6 +51,7 @@ export interface AlarmInput {
   time?: string;
   repeat?: string;
   advanceMinutes?: number;
+  monthlyAnchorDay?: number;
 }
 
 export interface TaskInput {
@@ -117,6 +119,15 @@ function validateTime(value: string | undefined, message: string): void {
   }
 }
 
+function validateMonthlyAnchorDay(value: number | undefined): void {
+  if (
+    value !== undefined &&
+    (!Number.isFinite(value) || !Number.isInteger(value) || value < 1 || value > 31)
+  ) {
+    throw new Error("Monthly anchor day must be an integer from 1 to 31");
+  }
+}
+
 function generateTaskId(generateId: (() => string) | undefined): string {
   const id = generateId?.() ?? globalThis.crypto?.randomUUID?.();
   if (!id) {
@@ -151,6 +162,14 @@ export function createTask(input: TaskInput, options: CreateTaskOptions = {}): T
     throw new Error("Alarm advance minutes must be a non-negative integer");
   }
 
+  validateMonthlyAnchorDay(input.alarm?.monthlyAnchorDay);
+
+  const repeat = normalizeRepeatRule(input.alarm?.repeat);
+  const monthlyAnchorDay =
+    repeat === "monthly" && alarmTime
+      ? (input.alarm?.monthlyAnchorDay ?? Number(input.date.slice(8, 10)))
+      : undefined;
+
   const timestamp = (options.now ?? new Date()).toISOString();
   return {
     id: generateTaskId(options.generateId),
@@ -166,8 +185,9 @@ export function createTask(input: TaskInput, options: CreateTaskOptions = {}): T
     alarm: {
       enabled: alarmEnabled,
       time: alarmTime,
-      repeat: normalizeRepeatRule(input.alarm?.repeat),
+      repeat,
       advanceMinutes,
+      monthlyAnchorDay,
     },
   };
 }

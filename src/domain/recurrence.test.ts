@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { combineDateAndTime, nextAlarmDate } from "./recurrence";
+import { createTask } from "./task";
 
 describe("nextAlarmDate", () => {
   it("returns no next date for once", () => {
@@ -74,6 +75,40 @@ describe("nextAlarmDate", () => {
 
   it("preserves parsed instant cadence for timezone offsets", () => {
     expect(nextAlarmDate("2026-05-21T09:00:00.000+09:00", "daily")).toBe("2026-05-22T00:00:00.000Z");
+  });
+
+  it("rejects invalid monthly anchor days", () => {
+    for (const anchorDay of [0, 32, Number.NaN]) {
+      expect(() =>
+        nextAlarmDate("2026-01-31T09:00:00.000Z", "monthly", { anchorDay }),
+      ).toThrow("Monthly anchor day must be an integer from 1 to 31");
+    }
+  });
+
+  it("recovers monthly recurrence using a persisted task anchor day", () => {
+    const task = createTask(
+      {
+        title: "Monthly billing",
+        date: "2026-01-31",
+        source: "manual",
+        alarm: {
+          enabled: true,
+          time: "09:00",
+          repeat: "monthly",
+        },
+      },
+      {
+        now: new Date("2026-01-01T00:00:00.000Z"),
+        generateId: () => "monthly-task",
+      },
+    );
+    const jan = combineDateAndTime(task.date, task.alarm.time);
+    const feb = nextAlarmDate(jan, task.alarm.repeat, { anchorDay: task.alarm.monthlyAnchorDay });
+
+    expect(feb).toBe("2026-02-28T00:00:00.000Z");
+    expect(nextAlarmDate(feb!, task.alarm.repeat, { anchorDay: task.alarm.monthlyAnchorDay })).toBe(
+      "2026-03-31T00:00:00.000Z",
+    );
   });
 });
 

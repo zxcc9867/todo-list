@@ -57,6 +57,15 @@ function validateTimeInput(time: string): void {
   }
 }
 
+function validateAnchorDay(anchorDay: number | undefined): void {
+  if (
+    anchorDay !== undefined &&
+    (!Number.isFinite(anchorDay) || !Number.isInteger(anchorDay) || anchorDay < 1 || anchorDay > 31)
+  ) {
+    throw new Error("Monthly anchor day must be an integer from 1 to 31");
+  }
+}
+
 export function nextAlarmDate(
   lastIso: string,
   repeat: RepeatRule,
@@ -67,6 +76,7 @@ export function nextAlarmDate(
   if (Number.isNaN(last.getTime())) {
     throw new Error("Invalid alarm date");
   }
+  validateAnchorDay(options.anchorDay);
 
   if (repeat === "once") {
     return undefined;

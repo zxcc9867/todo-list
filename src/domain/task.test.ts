@@ -34,6 +34,24 @@ describe("createTask", () => {
     expect(task.status).toBe("active");
   });
 
+  it("stores the monthly anchor day for monthly alarms", () => {
+    const task = createTask(
+      {
+        title: "Monthly billing",
+        date: "2026-01-31",
+        source: "manual",
+        alarm: {
+          enabled: true,
+          time: "09:00",
+          repeat: "monthly",
+        },
+      },
+      fixedOptions,
+    );
+
+    expect(task.alarm.monthlyAnchorDay).toBe(31);
+  });
+
   it("rejects an empty title", () => {
     expect(() =>
       createTask(
@@ -144,6 +162,27 @@ describe("createTask", () => {
           fixedOptions,
         ),
       ).toThrow("Alarm advance minutes must be a non-negative integer");
+    }
+  });
+
+  it("rejects invalid monthly anchor days", () => {
+    for (const monthlyAnchorDay of [0, 32]) {
+      expect(() =>
+        createTask(
+          {
+            title: "Invalid monthly anchor",
+            date: "2026-01-31",
+            source: "manual",
+            alarm: {
+              enabled: true,
+              time: "09:00",
+              repeat: "monthly",
+              monthlyAnchorDay,
+            },
+          },
+          fixedOptions,
+        ),
+      ).toThrow("Monthly anchor day must be an integer from 1 to 31");
     }
   });
 
