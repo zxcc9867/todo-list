@@ -5,7 +5,13 @@ import { TaskCard } from "./TaskCard";
 import { TaskForm } from "./TaskForm";
 
 const selectedDate = "2026-05-21";
-const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
+const labels = {
+  selectedDate: "\uc120\ud0dd\ud55c \ub0a0\uc9dc: 5\uc6d4 21\uc77c \ubaa9\uc694\uc77c",
+  month: "2026\ub144 5\uc6d4",
+  japanHolidayBase: "\uc77c\ubcf8 \uacf5\ud734\uc77c \uae30\ubcf8",
+  koreaHolidayToggle: "\ub300\ud55c\ubbfc\uad6d \uacf5\ud734\uc77c \ud45c\uc2dc",
+};
+const weekdays = ["\uc77c", "\uc6d4", "\ud654", "\uc218", "\ubaa9", "\uae08", "\ud1a0"];
 
 interface CalendarViewProps {
   tasks: Task[];
@@ -29,12 +35,12 @@ export function CalendarView({
     <section className="panel">
       <div className="calendar-header">
         <div>
-          <p className="eyebrow">선택한 날짜: 5월 21일 목요일</p>
-          <h2>2026년 5월</h2>
+          <p className="eyebrow">{labels.selectedDate}</p>
+          <h2>{labels.month}</h2>
         </div>
-        <span className="soft-pill">일본 공휴일 기본</span>
+        <span className="soft-pill">{labels.japanHolidayBase}</span>
         <button type="button" className="soft-pill blue" onClick={onToggleKoreanHolidays}>
-          대한민국 공휴일 표시 {showKoreanHolidays ? "ON" : "OFF"}
+          {labels.koreaHolidayToggle} {showKoreanHolidays ? "ON" : "OFF"}
         </button>
       </div>
 
@@ -69,7 +75,7 @@ export function CalendarView({
 
       <div className="inline-editor">
         <div className="inline-header">
-          <h3>선택한 날짜: 5월 21일 목요일</h3>
+          <h3>{labels.selectedDate}</h3>
           <Plus size={18} aria-hidden="true" />
         </div>
         <TaskForm date={selectedDate} source="calendar" onAdd={onAdd} />

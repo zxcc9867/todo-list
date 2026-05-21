@@ -1,13 +1,21 @@
 import { useState } from "react";
 import type { RepeatRule, TaskInput, TaskSource } from "../domain/task";
 
+const labels = {
+  title: "\uc624\ub298 \ud560 \uc77c",
+  alarmTime: "\uc54c\ub78c \uc2dc\uac04",
+  repeatAlarm: "\ubc18\ubcf5 \uc54c\ub78c",
+  placeholder: "\uc608: \uc8fc\uac04 \ud68c\uace0 \ucd08\uc548 \uc815\ub9ac",
+  submit: "\ub4f1\ub85d",
+};
+
 const repeatOptions: Array<{ value: RepeatRule; label: string }> = [
-  { value: "once", label: "1회" },
-  { value: "daily", label: "매일" },
-  { value: "weekdays", label: "평일" },
-  { value: "weekly", label: "매주" },
-  { value: "monthly", label: "매월" },
-  { value: "until-completed", label: "완료까지 반복" },
+  { value: "once", label: "\u0031\ud68c" },
+  { value: "daily", label: "\ub9e4\uc77c" },
+  { value: "weekdays", label: "\ud3c9\uc77c" },
+  { value: "weekly", label: "\ub9e4\uc8fc" },
+  { value: "monthly", label: "\ub9e4\uc6d4" },
+  { value: "until-completed", label: "\uc644\ub8cc\uae4c\uc9c0 \ubc18\ubcf5" },
 ];
 
 interface TaskFormProps {
@@ -46,29 +54,29 @@ export function TaskForm({ date, source, onAdd }: TaskFormProps) {
   return (
     <form className="task-form" onSubmit={handleSubmit}>
       <label>
-        <span>오늘 할 일</span>
+        <span>{labels.title}</span>
         <input
           value={title}
           onChange={(event) => setTitle(event.target.value)}
-          placeholder="예: 주간 회고 초안 정리"
-          aria-label="오늘 할 일"
+          placeholder={labels.placeholder}
+          aria-label={labels.title}
         />
       </label>
       <label>
-        <span>알람 시간</span>
+        <span>{labels.alarmTime}</span>
         <input
           type="time"
           value={time}
           onChange={(event) => setTime(event.target.value)}
-          aria-label="알람 시간"
+          aria-label={labels.alarmTime}
         />
       </label>
       <label>
-        <span>반복 알람</span>
+        <span>{labels.repeatAlarm}</span>
         <select
           value={repeat}
           onChange={(event) => setRepeat(event.target.value as RepeatRule)}
-          aria-label="반복 알람"
+          aria-label={labels.repeatAlarm}
         >
           {repeatOptions.map((option) => (
             <option key={option.value} value={option.value}>
@@ -77,7 +85,7 @@ export function TaskForm({ date, source, onAdd }: TaskFormProps) {
           ))}
         </select>
       </label>
-      <button type="submit">등록</button>
+      <button type="submit">{labels.submit}</button>
     </form>
   );
 }

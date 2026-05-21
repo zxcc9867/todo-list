@@ -3,12 +3,21 @@ import type { ComponentType, ReactNode } from "react";
 
 export type ViewName = "today" | "calendar" | "completed" | "alarms" | "settings";
 
+const labels = {
+  today: "\uc624\ub298",
+  calendar: "\uce98\ub9b0\ub354",
+  completed: "\uc644\ub8cc",
+  alarms: "\uc54c\ub78c",
+  settings: "\uc124\uc815",
+  mainMenu: "\uc8fc\uc694 \uba54\ub274",
+};
+
 const navItems: Array<{ id: ViewName; label: string; Icon: ComponentType<{ size?: number }> }> = [
-  { id: "today", label: "오늘", Icon: ListTodo },
-  { id: "calendar", label: "캘린더", Icon: CalendarDays },
-  { id: "completed", label: "완료", Icon: CheckCircle2 },
-  { id: "alarms", label: "알람", Icon: AlarmClock },
-  { id: "settings", label: "설정", Icon: Settings },
+  { id: "today", label: labels.today, Icon: ListTodo },
+  { id: "calendar", label: labels.calendar, Icon: CalendarDays },
+  { id: "completed", label: labels.completed, Icon: CheckCircle2 },
+  { id: "alarms", label: labels.alarms, Icon: AlarmClock },
+  { id: "settings", label: labels.settings, Icon: Settings },
 ];
 
 interface LayoutProps {
@@ -20,7 +29,7 @@ interface LayoutProps {
 export function Layout({ view, onViewChange, children }: LayoutProps) {
   return (
     <main className="app-frame">
-      <aside className="sidebar" aria-label="주요 메뉴">
+      <aside className="sidebar" aria-label={labels.mainMenu}>
         <div className="brand">
           <span className="brand-mark" aria-hidden="true">
             J

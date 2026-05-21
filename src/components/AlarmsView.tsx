@@ -1,6 +1,12 @@
 import type { Task } from "../domain/task";
 import { TaskCard } from "./TaskCard";
 
+const labels = {
+  repeatAlarm: "\ubc18\ubcf5 \uc54c\ub78c",
+  alarms: "\uc54c\ub78c",
+  empty: "\ud65c\uc131\ud654\ub41c \uc54c\ub78c\uc774 \uc5c6\uc2b5\ub2c8\ub2e4.",
+};
+
 interface AlarmsViewProps {
   tasks: Task[];
   onComplete: (id: string) => void;
@@ -13,8 +19,8 @@ export function AlarmsView({ tasks, onComplete }: AlarmsViewProps) {
     <section className="panel">
       <div className="view-header">
         <div>
-          <p className="eyebrow">반복 알람</p>
-          <h2>알람</h2>
+          <p className="eyebrow">{labels.repeatAlarm}</p>
+          <h2>{labels.alarms}</h2>
         </div>
       </div>
       {alarms.length > 0 ? (
@@ -24,7 +30,7 @@ export function AlarmsView({ tasks, onComplete }: AlarmsViewProps) {
           ))}
         </div>
       ) : (
-        <p className="empty-state">활성화된 알람이 없습니다.</p>
+        <p className="empty-state">{labels.empty}</p>
       )}
     </section>
   );

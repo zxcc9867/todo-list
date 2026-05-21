@@ -1,13 +1,18 @@
 import { Check } from "lucide-react";
 import type { RepeatRule, Task } from "../domain/task";
 
+const labels = {
+  noAlarm: "\uc54c\ub78c \uc5c6\uc74c",
+  complete: "\uc644\ub8cc",
+};
+
 const repeatLabels: Record<RepeatRule, string> = {
-  once: "1회",
-  daily: "매일",
-  weekdays: "평일",
-  weekly: "매주",
-  monthly: "매월",
-  "until-completed": "완료까지 반복",
+  once: "\u0031\ud68c",
+  daily: "\ub9e4\uc77c",
+  weekdays: "\ud3c9\uc77c",
+  weekly: "\ub9e4\uc8fc",
+  monthly: "\ub9e4\uc6d4",
+  "until-completed": "\uc644\ub8cc\uae4c\uc9c0 \ubc18\ubcf5",
 };
 
 interface TaskCardProps {
@@ -16,7 +21,7 @@ interface TaskCardProps {
 }
 
 export function TaskCard({ task, onComplete }: TaskCardProps) {
-  const alarmLabel = task.alarm.enabled ? repeatLabels[task.alarm.repeat] : "알람 없음";
+  const alarmLabel = task.alarm.enabled ? repeatLabels[task.alarm.repeat] : labels.noAlarm;
   const detailLabel = task.time ? `${task.time} · ${alarmLabel}` : alarmLabel;
 
   return (
@@ -30,11 +35,11 @@ export function TaskCard({ task, onComplete }: TaskCardProps) {
           type="button"
           className="icon-action"
           onClick={() => onComplete(task.id)}
-          aria-label={`${task.title} 완료`}
-          title="완료"
+          aria-label={`${task.title} ${labels.complete}`}
+          title={labels.complete}
         >
           <Check size={17} />
-          <span className="sr-only">완료</span>
+          <span className="sr-only">{labels.complete}</span>
         </button>
       ) : null}
     </article>

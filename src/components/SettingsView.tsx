@@ -1,10 +1,22 @@
 import { Bell } from "lucide-react";
 import type { AppSettings, ThemePreference } from "../domain/task";
 
+const labels = {
+  settings: "\uc124\uc815",
+  theme: "\ud14c\ub9c8",
+  system: "\uc2dc\uc2a4\ud15c",
+  light: "\ub77c\uc774\ud2b8",
+  dark: "\ub2e4\ud06c",
+  requestNotifications: "\uc54c\ub9bc \uad8c\ud55c \uc694\uccad",
+  startupPrefix: "\uc790\ub3d9\uc2e4\ud589\uc740 ",
+  startupMiddle: "\ub85c \ucf1c\uace0 ",
+  startupSuffix: "\ub85c \ub044\ub2c8\ub2e4.",
+};
+
 const themeOptions: Array<{ value: ThemePreference; label: string }> = [
-  { value: "system", label: "시스템" },
-  { value: "light", label: "라이트" },
-  { value: "dark", label: "다크" },
+  { value: "system", label: labels.system },
+  { value: "light", label: labels.light },
+  { value: "dark", label: labels.dark },
 ];
 
 interface SettingsViewProps {
@@ -18,13 +30,13 @@ export function SettingsView({ settings, onThemeChange, onRequestNotifications }
     <section className="panel settings-panel">
       <div className="view-header">
         <div>
-          <p className="eyebrow">테마</p>
-          <h2>설정</h2>
+          <p className="eyebrow">{labels.theme}</p>
+          <h2>{labels.settings}</h2>
         </div>
       </div>
 
       <fieldset className="segmented-control">
-        <legend>테마</legend>
+        <legend>{labels.theme}</legend>
         {themeOptions.map((option) => (
           <label key={option.value}>
             <input
@@ -41,11 +53,15 @@ export function SettingsView({ settings, onThemeChange, onRequestNotifications }
 
       <button type="button" className="primary-action" onClick={onRequestNotifications}>
         <Bell size={17} />
-        <span>알림 권한 요청</span>
+        <span>{labels.requestNotifications}</span>
       </button>
 
       <p className="startup-note">
-        자동실행은 <code>npm run startup:enable</code>로 켜고 <code>npm run startup:disable</code>로 끕니다.
+        {labels.startupPrefix}
+        <code>npm run startup:enable</code>
+        {labels.startupMiddle}
+        <code>npm run startup:disable</code>
+        {labels.startupSuffix}
       </p>
     </section>
   );
