@@ -329,12 +329,24 @@ button.soft-pill {
 
 .calendar-cell {
   min-height: 96px;
+  display: block;
+  width: 100%;
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 10px;
   background: var(--panel-muted);
+  color: var(--ink);
+  text-align: left;
   overflow: hidden;
   overflow-wrap: anywhere;
+}
+
+.calendar-cell:hover:not(.blank) {
+  border-color: var(--green);
+}
+
+.calendar-cell.blank {
+  cursor: default;
 }
 
 .calendar-cell.weekend {

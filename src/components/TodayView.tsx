@@ -2,9 +2,8 @@ import type { Task, TaskInput } from "../domain/task";
 import { TaskCard } from "./TaskCard";
 import { TaskForm } from "./TaskForm";
 
-const today = "2026-05-21";
 const labels = {
-  selectedDate: "\uc120\ud0dd\ud55c \ub0a0\uc9dc: 5\uc6d4 21\uc77c \ubaa9\uc694\uc77c",
+  selectedDatePrefix: "\uc120\ud0dd\ud55c \ub0a0\uc9dc:",
   todayTasks: "\uc624\ub298 \ud560 \uc77c",
   todaySummary: "\uc624\ub298 \uc694\uc57d",
   activeTasks: "\uc624\ub298 \ud574\uc57c \ud560 \uc77c",
@@ -13,6 +12,28 @@ const labels = {
   noActiveTasks: "\ub4f1\ub85d\ub41c \ud560 \uc77c\uc774 \uc5c6\uc2b5\ub2c8\ub2e4.",
   noCompletedTasks: "\uc544\uc9c1 \uc644\ub8cc\ud55c \uc77c\uc774 \uc5c6\uc2b5\ub2c8\ub2e4.",
 };
+const weekdayNames = [
+  "\uc77c\uc694\uc77c",
+  "\uc6d4\uc694\uc77c",
+  "\ud654\uc694\uc77c",
+  "\uc218\uc694\uc77c",
+  "\ubaa9\uc694\uc77c",
+  "\uae08\uc694\uc77c",
+  "\ud1a0\uc694\uc77c",
+];
+
+function toLocalDateKey(date = new Date()): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function formatSelectedDate(date: Date): string {
+  return `${labels.selectedDatePrefix} ${date.getMonth() + 1}\uc6d4 ${date.getDate()}\uc77c ${
+    weekdayNames[date.getDay()]
+  }`;
+}
 
 interface TodayViewProps {
   tasks: Task[];
@@ -21,6 +42,9 @@ interface TodayViewProps {
 }
 
 export function TodayView({ tasks, onAdd, onComplete }: TodayViewProps) {
+  const now = new Date();
+  const today = toLocalDateKey(now);
+  const todayLabel = formatSelectedDate(now);
   const active = tasks.filter((task) => task.date === today && task.status === "active");
   const done = tasks.filter((task) => task.date === today && task.status === "completed");
   const alarms = tasks.filter((task) => task.status === "active" && task.alarm.enabled);
@@ -29,7 +53,7 @@ export function TodayView({ tasks, onAdd, onComplete }: TodayViewProps) {
     <section className="panel">
       <div className="view-header">
         <div>
-          <p className="eyebrow">{labels.selectedDate}</p>
+          <p className="eyebrow">{todayLabel}</p>
           <h2>{labels.todayTasks}</h2>
         </div>
       </div>
