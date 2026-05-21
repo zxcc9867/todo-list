@@ -1,0 +1,45 @@
+<svg width="1280" height="720" viewBox="0 0 1280 720" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Jini Tasks thumbnail</title>
+  <desc id="desc">A desktop preview of the Jini Tasks local-first todo app with today tasks, calendar, holidays, alarms, and dark mode.</desc>
+  <rect width="1280" height="720" fill="#F4F6F2"/>
+  <rect x="72" y="56" width="1136" height="608" rx="28" fill="#FFFFFF" stroke="#D9E1DD" stroke-width="2"/>
+  <rect x="104" y="88" width="220" height="544" rx="18" fill="#17211E"/>
+  <rect x="132" y="124" width="44" height="44" rx="12" fill="#1E7B62"/>
+  <text x="192" y="154" fill="#EDF5F1" font-family="Segoe UI, Arial, sans-serif" font-size="30" font-weight="700">Jini Tasks</text>
+  <rect x="132" y="212" width="164" height="44" rx="12" fill="#253C35"/>
+  <text x="168" y="241" fill="#72D2AE" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="700">Today</text>
+  <text x="168" y="301" fill="#A7B8B2" font-family="Segoe UI, Arial, sans-serif" font-size="18">Calendar</text>
+  <text x="168" y="359" fill="#A7B8B2" font-family="Segoe UI, Arial, sans-serif" font-size="18">Done</text>
+  <text x="168" y="417" fill="#A7B8B2" font-family="Segoe UI, Arial, sans-serif" font-size="18">Alarms</text>
+  <text x="168" y="475" fill="#A7B8B2" font-family="Segoe UI, Arial, sans-serif" font-size="18">Settings</text>
+  <text x="364" y="134" fill="#62706C" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="700">Selected date: May 21 Thursday</text>
+  <text x="364" y="178" fill="#17211F" font-family="Segoe UI, Arial, sans-serif" font-size="46" font-weight="800">Today checklist</text>
+  <rect x="364" y="220" width="240" height="104" rx="16" fill="#FBFCFB" stroke="#D9E1DD" stroke-width="2"/>
+  <text x="392" y="270" fill="#17211F" font-family="Segoe UI, Arial, sans-serif" font-size="40" font-weight="800">4</text>
+  <text x="392" y="300" fill="#62706C" font-family="Segoe UI, Arial, sans-serif" font-size="18">Active tasks</text>
+  <rect x="628" y="220" width="240" height="104" rx="16" fill="#FBFCFB" stroke="#D9E1DD" stroke-width="2"/>
+  <text x="656" y="270" fill="#17211F" font-family="Segoe UI, Arial, sans-serif" font-size="40" font-weight="800">2</text>
+  <text x="656" y="300" fill="#62706C" font-family="Segoe UI, Arial, sans-serif" font-size="18">Completed</text>
+  <rect x="892" y="220" width="240" height="104" rx="16" fill="#FBFCFB" stroke="#D9E1DD" stroke-width="2"/>
+  <text x="920" y="270" fill="#17211F" font-family="Segoe UI, Arial, sans-serif" font-size="40" font-weight="800">3</text>
+  <text x="920" y="300" fill="#62706C" font-family="Segoe UI, Arial, sans-serif" font-size="18">Alarms</text>
+  <rect x="364" y="368" width="360" height="190" rx="16" fill="#FBFCFB" stroke="#D9E1DD" stroke-width="2"/>
+  <text x="392" y="408" fill="#17211F" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="800">Today</text>
+  <rect x="392" y="434" width="304" height="44" rx="10" fill="#FFFFFF" stroke="#D9E1DD" stroke-width="2"/>
+  <rect x="412" y="447" width="18" height="18" rx="5" fill="#1E7B62"/>
+  <path d="M416 456L421 461L429 451" stroke="#F4F6F2" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="446" y="462" fill="#17211F" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700">Review weekly plan</text>
+  <rect x="392" y="492" width="304" height="44" rx="10" fill="#FFFFFF" stroke="#D9E1DD" stroke-width="2"/>
+  <rect x="412" y="505" width="18" height="18" rx="5" fill="#FFFFFF" stroke="#1E7B62" stroke-width="2"/>
+  <text x="446" y="520" fill="#17211F" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700">Prepare calendar tasks</text>
+  <rect x="760" y="368" width="372" height="190" rx="16" fill="#FBFCFB" stroke="#D9E1DD" stroke-width="2"/>
+  <text x="788" y="408" fill="#17211F" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="800">Holiday calendar</text>
+  <rect x="788" y="432" width="64" height="50" rx="10" fill="#F8E6EB"/>
+  <text x="810" y="463" fill="#B4425A" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="800">JP</text>
+  <rect x="864" y="432" width="64" height="50" rx="10" fill="#E7EEF8"/>
+  <text x="886" y="463" fill="#245F9F" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="800">KR</text>
+  <rect x="940" y="432" width="164" height="50" rx="10" fill="#E4F3EC"/>
+  <text x="972" y="463" fill="#1E7B62" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="800">Dark mode</text>
+  <rect x="788" y="502" width="316" height="30" rx="8" fill="#FFFFFF" stroke="#D9E1DD" stroke-width="2"/>
+  <text x="804" y="523" fill="#62706C" font-family="Segoe UI, Arial, sans-serif" font-size="14">Local-first, Codex CLI ready</text>
+</svg>
