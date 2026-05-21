@@ -35,17 +35,18 @@ export function TaskForm({ date, source, onAdd }: TaskFormProps) {
     if (!nextTitle) {
       return;
     }
+    const nextTime = time || undefined;
 
     onAdd({
       title: nextTitle,
       date,
-      time,
       priority: "normal",
       source,
+      ...(nextTime ? { time: nextTime } : {}),
       alarm: {
-        enabled: Boolean(time),
-        time,
+        enabled: Boolean(nextTime),
         repeat,
+        ...(nextTime ? { time: nextTime } : {}),
       },
     });
     setTitle("");

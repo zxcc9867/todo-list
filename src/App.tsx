@@ -6,8 +6,8 @@ import { CompletedView } from "./components/CompletedView";
 import { Layout, type ViewName } from "./components/Layout";
 import { SettingsView } from "./components/SettingsView";
 import { TodayView } from "./components/TodayView";
-import { completeTask, type AppData, type TaskInput, type ThemePreference } from "./domain/task";
-import { addTaskToStore, loadStore, saveStore } from "./storage/taskStore";
+import { completeTask, createTask, type AppData, type TaskInput, type ThemePreference } from "./domain/task";
+import { loadStore, saveStore } from "./storage/taskStore";
 
 function resolveTheme(theme: ThemePreference): "light" | "dark" {
   if (theme !== "system") {
@@ -39,44 +39,49 @@ export default function App() {
 
   const tasks = useMemo(() => data.tasks, [data.tasks]);
 
-  function refresh(next: AppData) {
-    setData(saveStore(next));
+  function updateData(updater: (current: AppData) => AppData) {
+    setData((current) => saveStore(updater(current)));
   }
 
   function addTask(input: TaskInput) {
-    setData(addTaskToStore(input));
+    const task = createTask(input);
+    updateData((current) => ({
+      ...current,
+      tasks: [task, ...current.tasks],
+    }));
   }
 
   function markComplete(id: string) {
-    refresh({
-      ...data,
-      tasks: data.tasks.map((task) => (task.id === id ? completeTask(task) : task)),
-    });
+    const completedAt = new Date();
+    updateData((current) => ({
+      ...current,
+      tasks: current.tasks.map((task) => (task.id === id ? completeTask(task, completedAt) : task)),
+    }));
   }
 
   function setTheme(theme: ThemePreference) {
-    refresh({ ...data, settings: { ...data.settings, theme } });
+    updateData((current) => ({ ...current, settings: { ...current.settings, theme } }));
   }
 
   function toggleKoreanHolidays() {
-    refresh({
-      ...data,
+    updateData((current) => ({
+      ...current,
       settings: {
-        ...data.settings,
-        showKoreanHolidays: !data.settings.showKoreanHolidays,
+        ...current.settings,
+        showKoreanHolidays: !current.settings.showKoreanHolidays,
       },
-    });
+    }));
   }
 
   function handleRequestNotifications() {
     void requestNotificationPermission().then((permission) => {
-      refresh({
-        ...data,
+      updateData((current) => ({
+        ...current,
         settings: {
-          ...data.settings,
+          ...current.settings,
           notificationsEnabled: permission === "granted",
         },
-      });
+      }));
     });
   }
 

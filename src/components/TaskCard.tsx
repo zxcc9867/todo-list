@@ -22,7 +22,7 @@ interface TaskCardProps {
 
 export function TaskCard({ task, onComplete }: TaskCardProps) {
   const alarmLabel = task.alarm.enabled ? repeatLabels[task.alarm.repeat] : labels.noAlarm;
-  const detailLabel = task.time ? `${task.time} · ${alarmLabel}` : alarmLabel;
+  const detailLabel = task.time ? `${task.time} / ${alarmLabel}` : alarmLabel;
 
   return (
     <article className={`task-card ${task.status === "completed" ? "is-done" : ""}`}>
