@@ -4,7 +4,7 @@ import {
   type AppData,
   type AppSettings,
   type Task,
-} from "../domain/task";
+} from "../domain/task.ts";
 
 const timePattern = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
 
