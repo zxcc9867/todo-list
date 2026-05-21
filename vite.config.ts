@@ -3,7 +3,7 @@ import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "vite";
-import { defaultData, normalizeData } from "./src/storage/appData";
+import { defaultData, mergePostedAppData, normalizeData } from "./src/storage/appData";
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
 const dataPath = path.join(rootDir, "data", "tasks.json");
@@ -20,7 +20,7 @@ async function loadAppData() {
 }
 
 async function saveAppData(data: unknown) {
-  const normalizedData = normalizeData(data);
+  const normalizedData = mergePostedAppData(await loadAppData(), normalizeData(data));
   const directory = path.dirname(dataPath);
   await mkdir(directory, { recursive: true });
 

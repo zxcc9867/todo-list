@@ -117,3 +117,34 @@ export function normalizeData(value: unknown): AppData {
     settings: normalizeSettings(value.settings),
   };
 }
+
+function timestampValue(value: string): number {
+  const timestamp = new Date(value).getTime();
+  return Number.isNaN(timestamp) ? 0 : timestamp;
+}
+
+function sortByUpdatedAtDesc(left: Task, right: Task): number {
+  return timestampValue(right.updatedAt) - timestampValue(left.updatedAt);
+}
+
+export function mergePostedAppData(existingData: AppData, postedData: AppData): AppData {
+  const existing = normalizeData(existingData);
+  const posted = normalizeData(postedData);
+  const tasksById = new Map<string, Task>();
+
+  for (const task of existing.tasks) {
+    tasksById.set(task.id, task);
+  }
+
+  for (const task of posted.tasks) {
+    const currentTask = tasksById.get(task.id);
+    if (!currentTask || timestampValue(task.updatedAt) >= timestampValue(currentTask.updatedAt)) {
+      tasksById.set(task.id, task);
+    }
+  }
+
+  return {
+    tasks: Array.from(tasksById.values()).sort(sortByUpdatedAtDesc),
+    settings: posted.settings,
+  };
+}
