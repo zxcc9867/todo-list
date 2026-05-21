@@ -1,5 +1,23 @@
 {
-  "tasks": [],
+  "tasks": [
+    {
+      "id": "0bdb8ac2-5de1-44ae-83d8-793e4f8fc637",
+      "title": "코덱스로 추가한 테스트",
+      "notes": "",
+      "status": "active",
+      "date": "2026-05-21",
+      "time": "15:30",
+      "priority": "normal",
+      "source": "codex",
+      "createdAt": "2026-05-21T08:17:16.590Z",
+      "updatedAt": "2026-05-21T08:17:16.590Z",
+      "alarm": {
+        "enabled": true,
+        "time": "15:30",
+        "repeat": "weekly"
+      }
+    }
+  ],
   "settings": {
     "theme": "system",
     "showKoreanHolidays": true,
