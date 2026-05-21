@@ -105,9 +105,9 @@ describe("nextAlarmDate", () => {
     const jan = combineDateAndTime(task.date, task.alarm.time);
     const feb = nextAlarmDate(jan, task.alarm.repeat, { anchorDay: task.alarm.monthlyAnchorDay });
 
-    expect(feb).toBe("2026-02-28T00:00:00.000Z");
+    expect(feb).toBe(combineDateAndTime("2026-02-28", "09:00"));
     expect(nextAlarmDate(feb!, task.alarm.repeat, { anchorDay: task.alarm.monthlyAnchorDay })).toBe(
-      "2026-03-31T00:00:00.000Z",
+      combineDateAndTime("2026-03-31", "09:00"),
     );
   });
 });
