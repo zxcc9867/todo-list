@@ -3,3 +3,4 @@ dist/
 tsconfig.tsbuildinfo
 .superpowers/
 ui-mockup*.png
+.vite*.log
