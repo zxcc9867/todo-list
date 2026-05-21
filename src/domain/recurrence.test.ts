@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { nextAlarmDate } from "./recurrence";
+import { combineDateAndTime, nextAlarmDate } from "./recurrence";
 
 describe("nextAlarmDate", () => {
   it("returns no next date for once", () => {
@@ -22,7 +22,58 @@ describe("nextAlarmDate", () => {
     expect(nextAlarmDate("2026-05-21T15:30:00.000Z", "monthly")).toBe("2026-06-21T15:30:00.000Z");
   });
 
+  it("clamps January 31 monthly alarms to February 28 in non-leap years", () => {
+    expect(nextAlarmDate("2026-01-31T09:00:00.000Z", "monthly")).toBe("2026-02-28T09:00:00.000Z");
+  });
+
+  it("clamps January 30 monthly alarms to February 28 in non-leap years", () => {
+    expect(nextAlarmDate("2026-01-30T09:00:00.000Z", "monthly")).toBe("2026-02-28T09:00:00.000Z");
+  });
+
+  it("clamps January 31 monthly alarms to February 29 in leap years", () => {
+    expect(nextAlarmDate("2024-01-31T09:00:00.000Z", "monthly")).toBe("2024-02-29T09:00:00.000Z");
+  });
+
+  it("clamps March 31 monthly alarms to April 30", () => {
+    expect(nextAlarmDate("2026-03-31T09:00:00.000Z", "monthly")).toBe("2026-04-30T09:00:00.000Z");
+  });
+
   it("treats until-completed as daily cadence", () => {
     expect(nextAlarmDate("2026-05-21T18:00:00.000Z", "until-completed")).toBe("2026-05-22T18:00:00.000Z");
+  });
+
+  it("throws for invalid daily alarm input", () => {
+    expect(() => nextAlarmDate("not-a-date", "daily")).toThrow("Invalid alarm date");
+  });
+
+  it("throws for invalid once alarm input", () => {
+    expect(() => nextAlarmDate("not-a-date", "once")).toThrow("Invalid alarm date");
+  });
+
+  it("skips Saturday inputs for weekdays", () => {
+    expect(nextAlarmDate("2026-05-23T09:00:00.000Z", "weekdays")).toBe("2026-05-25T09:00:00.000Z");
+  });
+
+  it("skips Sunday inputs for weekdays", () => {
+    expect(nextAlarmDate("2026-05-24T09:00:00.000Z", "weekdays")).toBe("2026-05-25T09:00:00.000Z");
+  });
+
+  it("preserves parsed instant cadence for timezone offsets", () => {
+    expect(nextAlarmDate("2026-05-21T09:00:00.000+09:00", "daily")).toBe("2026-05-22T00:00:00.000Z");
+  });
+});
+
+describe("combineDateAndTime", () => {
+  it("returns a canonical UTC ISO instant from local wall-clock input", () => {
+    const expected = new Date("2026-05-21T09:30:00").toISOString();
+
+    expect(combineDateAndTime("2026-05-21", "09:30")).toBe(expected);
+  });
+
+  it("round-trips combined local time through daily recurrence", () => {
+    const alarm = combineDateAndTime("2026-05-21", "09:00");
+    const expected = new Date("2026-05-22T09:00:00").toISOString();
+
+    expect(nextAlarmDate(alarm, "daily")).toBe(expected);
   });
 });
