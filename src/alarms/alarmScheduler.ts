@@ -19,7 +19,8 @@ export function findDueAlarms(tasks: Task[], now = new Date()): Task[] {
     if (task.status !== "active") return false;
     const due = alarmDate(task);
     if (!due) return false;
-    return Math.abs(due.getTime() - currentMinute) < 60_000;
+    const dueTime = due.getTime();
+    return dueTime <= currentMinute && currentMinute - dueTime < 60_000;
   });
 }
 
