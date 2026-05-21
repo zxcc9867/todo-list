@@ -1,0 +1,22 @@
+:root {
+  color-scheme: light;
+  font-family: "Segoe UI", "Noto Sans KR", Arial, sans-serif;
+  color: #17211f;
+  background: #f4f6f2;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+.app-shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 32px 20px;
+}
