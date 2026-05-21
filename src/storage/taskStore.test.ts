@@ -1,3 +1,6 @@
+import { mkdtemp, writeFile } from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
 import { beforeEach, describe, expect, it } from "vitest";
 import { addTaskToStore, defaultData, loadStore } from "./taskStore";
 
@@ -7,6 +10,27 @@ const fixedCreateOptions = {
   now: new Date("2026-05-21T06:30:00.000Z"),
   generateId: () => "task-fixed-id",
 };
+
+function validStoredTask(overrides: Record<string, unknown> = {}) {
+  return {
+    id: "valid-task",
+    title: "Valid task",
+    notes: "",
+    status: "active",
+    date: "2026-05-21",
+    time: "15:30",
+    priority: "normal",
+    source: "manual",
+    createdAt: "2026-05-21T06:30:00.000Z",
+    updatedAt: "2026-05-21T06:30:00.000Z",
+    alarm: {
+      enabled: true,
+      time: "15:30",
+      repeat: "weekly",
+    },
+    ...overrides,
+  };
+}
 
 describe("taskStore", () => {
   beforeEach(() => {
@@ -74,22 +98,7 @@ describe("taskStore", () => {
       storageKey,
       JSON.stringify({
         tasks: [
-          {
-            id: "valid-task",
-            title: "Valid task",
-            notes: "",
-            status: "active",
-            date: "2026-05-21",
-            priority: "normal",
-            source: "manual",
-            createdAt: "2026-05-21T06:30:00.000Z",
-            updatedAt: "2026-05-21T06:30:00.000Z",
-            alarm: {
-              enabled: true,
-              time: "15:30",
-              repeat: "weekly",
-            },
-          },
+          validStoredTask(),
           {
             id: "invalid-task",
             title: "Invalid task",
@@ -109,6 +118,24 @@ describe("taskStore", () => {
 
     expect(data.tasks).toHaveLength(1);
     expect(data.tasks[0].id).toBe("valid-task");
+  });
+
+  it.each([
+    ["missing priority", { priority: undefined }],
+    ["missing createdAt", { createdAt: undefined }],
+    ["missing updatedAt", { updatedAt: undefined }],
+    ["invalid alarm time", { alarm: { enabled: true, time: "99:99", repeat: "weekly" } }],
+    ["invalid advance minutes", { alarm: { enabled: true, repeat: "weekly", advanceMinutes: -1 } }],
+    ["invalid monthly anchor", { alarm: { enabled: true, repeat: "monthly", monthlyAnchorDay: 32 } }],
+  ])("drops stored tasks with %s", (_name, overrides) => {
+    localStorage.setItem(
+      storageKey,
+      JSON.stringify({
+        tasks: [validStoredTask(overrides)],
+      }),
+    );
+
+    expect(loadStore().tasks).toEqual([]);
   });
 
   it("persists monthly alarm anchor days", () => {
@@ -159,5 +186,42 @@ describe("task CLI domain integration", () => {
     );
 
     expect(task.alarm.monthlyAnchorDay).toBe(31);
+  });
+
+  it("loadData drops invalid tasks and normalizes invalid settings", async () => {
+    // @ts-expect-error CLI is an ESM script outside the TypeScript source tree.
+    const { loadData } = await import("../../scripts/task-cli.mjs");
+    const tempDir = await mkdtemp(path.join(os.tmpdir(), "jini-tasks-"));
+    const tempPath = path.join(tempDir, "tasks.json");
+    await writeFile(
+      tempPath,
+      JSON.stringify({
+        tasks: [validStoredTask(), validStoredTask({ id: "missing-priority", priority: undefined })],
+        settings: {
+          theme: "dark",
+          showKoreanHolidays: "yes",
+          notificationsEnabled: "no",
+        },
+      }),
+      "utf8",
+    );
+
+    expect(await loadData(tempPath)).toEqual({
+      tasks: [validStoredTask()],
+      settings: {
+        ...defaultData.settings,
+        theme: "dark",
+      },
+    });
+  });
+
+  it("loadData handles parsed non-object JSON as defaults", async () => {
+    // @ts-expect-error CLI is an ESM script outside the TypeScript source tree.
+    const { loadData } = await import("../../scripts/task-cli.mjs");
+    const tempDir = await mkdtemp(path.join(os.tmpdir(), "jini-tasks-"));
+    const tempPath = path.join(tempDir, "tasks.json");
+    await writeFile(tempPath, "null", "utf8");
+
+    expect(await loadData(tempPath)).toEqual(defaultData);
   });
 });

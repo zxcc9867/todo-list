@@ -2,15 +2,9 @@ import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { createTask } from "../src/domain/task.ts";
+import { defaultData, normalizeData } from "../src/storage/appData.ts";
 
-export const defaultData = {
-  tasks: [],
-  settings: {
-    theme: "system",
-    showKoreanHolidays: true,
-    notificationsEnabled: false,
-  },
-};
+export { defaultData };
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 export const dataPath = path.join(rootDir, "data", "tasks.json");
@@ -88,11 +82,7 @@ export function createCliTask(args, options = {}) {
 export async function loadData(targetPath = dataPath) {
   try {
     const rawData = await readFile(targetPath, "utf8");
-    const data = JSON.parse(rawData);
-    return {
-      tasks: Array.isArray(data.tasks) ? data.tasks : [],
-      settings: data.settings ?? defaultData.settings,
-    };
+    return normalizeData(JSON.parse(rawData));
   } catch (error) {
     if (error.code === "ENOENT") {
       return {

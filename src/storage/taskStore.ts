@@ -1,87 +1,15 @@
 import {
   createTask,
-  repeatRules,
   type AppData,
-  type AppSettings,
   type CreateTaskOptions,
-  type Task,
   type TaskInput,
 } from "../domain/task";
+import { cloneDefaultData, defaultData, normalizeData } from "./appData";
 
 const storageKey = "jini-tasks:data";
 const corruptStorageKeyPrefix = "jini-tasks:data:corrupt";
 
-export const defaultData: AppData = {
-  tasks: [],
-  settings: {
-    theme: "system",
-    showKoreanHolidays: true,
-    notificationsEnabled: false,
-  },
-};
-
-function cloneDefaultData(): AppData {
-  return {
-    tasks: [],
-    settings: { ...defaultData.settings },
-  };
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
-}
-
-function isValidTask(value: unknown): value is Task {
-  if (!isRecord(value) || !isRecord(value.alarm)) {
-    return false;
-  }
-
-  const alarm = value.alarm;
-  const validStatuses = ["active", "completed", "archived"];
-  const validSources = ["manual", "calendar", "codex"];
-
-  return (
-    typeof value.id === "string" &&
-    typeof value.title === "string" &&
-    typeof value.date === "string" &&
-    typeof value.status === "string" &&
-    validStatuses.includes(value.status) &&
-    typeof value.source === "string" &&
-    validSources.includes(value.source) &&
-    typeof alarm.enabled === "boolean" &&
-    typeof alarm.repeat === "string" &&
-    repeatRules.some((repeat) => repeat === alarm.repeat)
-  );
-}
-
-function normalizeSettings(value: unknown): AppSettings {
-  if (!isRecord(value)) {
-    return { ...defaultData.settings };
-  }
-
-  const settings = { ...defaultData.settings };
-  if (value.theme === "system" || value.theme === "light" || value.theme === "dark") {
-    settings.theme = value.theme;
-  }
-  if (typeof value.showKoreanHolidays === "boolean") {
-    settings.showKoreanHolidays = value.showKoreanHolidays;
-  }
-  if (typeof value.notificationsEnabled === "boolean") {
-    settings.notificationsEnabled = value.notificationsEnabled;
-  }
-  return settings;
-}
-
-function normalizeData(value: unknown): AppData {
-  if (!isRecord(value)) {
-    return cloneDefaultData();
-  }
-
-  return {
-    tasks: Array.isArray(value.tasks) ? value.tasks.filter(isValidTask) : [],
-    settings: normalizeSettings(value.settings),
-  };
-}
+export { defaultData };
 
 export function loadStore(): AppData {
   const rawData = localStorage.getItem(storageKey);
