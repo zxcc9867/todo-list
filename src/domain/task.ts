@@ -128,6 +128,12 @@ function validateMonthlyAnchorDay(value: number | undefined): void {
   }
 }
 
+function validatePriority(value: Task["priority"] | undefined): void {
+  if (value !== undefined && value !== "low" && value !== "normal" && value !== "high") {
+    throw new Error("Invalid task priority");
+  }
+}
+
 function generateTaskId(generateId: (() => string) | undefined): string {
   const id = generateId?.() ?? globalThis.crypto?.randomUUID?.();
   if (!id) {
@@ -146,6 +152,7 @@ export function createTask(input: TaskInput, options: CreateTaskOptions = {}): T
   }
 
   validateTime(input.time, "Task time must use HH:mm");
+  validatePriority(input.priority);
 
   const alarmEnabled = Boolean(input.alarm?.enabled);
   const alarmTime = input.alarm?.time ?? input.time;

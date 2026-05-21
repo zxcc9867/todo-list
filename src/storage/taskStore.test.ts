@@ -171,6 +171,22 @@ describe("task CLI domain integration", () => {
     ).toThrow("Task date must be a valid YYYY-MM-DD date");
   });
 
+  it("uses domain validation for invalid priorities", async () => {
+    // @ts-expect-error CLI is an ESM script outside the TypeScript source tree.
+    const { createTaskFromCliArgs } = await import("../../scripts/task-cli.mjs");
+
+    expect(() =>
+      createTaskFromCliArgs(
+        {
+          title: "bad priority",
+          date: "2026-05-21",
+          priority: "urgent",
+        },
+        fixedCreateOptions,
+      ),
+    ).toThrow("Invalid task priority");
+  });
+
   it("uses domain monthly anchor calculation", async () => {
     // @ts-expect-error CLI is an ESM script outside the TypeScript source tree.
     const { createTaskFromCliArgs } = await import("../../scripts/task-cli.mjs");

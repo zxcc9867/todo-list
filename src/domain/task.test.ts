@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createTask, normalizeRepeatRule } from "./task";
+import { createTask, normalizeRepeatRule, type TaskInput } from "./task";
 
 const fixedNow = new Date("2026-05-21T06:30:00.000Z");
 const fixedOptions = {
@@ -163,6 +163,20 @@ describe("createTask", () => {
         ),
       ).toThrow("Alarm advance minutes must be a non-negative integer");
     }
+  });
+
+  it("rejects invalid priorities", () => {
+    expect(() =>
+      createTask(
+        {
+          title: "Invalid priority",
+          date: "2026-05-21",
+          priority: "urgent",
+          source: "manual",
+        } as unknown as TaskInput,
+        fixedOptions,
+      ),
+    ).toThrow("Invalid task priority");
   });
 
   it("rejects invalid monthly anchor days", () => {
