@@ -1,0 +1,9 @@
+{
+  "name": "Jini Tasks",
+  "short_name": "Jini Tasks",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f4f6f2",
+  "theme_color": "#1e7b62",
+  "icons": []
+}
