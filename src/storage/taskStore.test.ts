@@ -127,3 +127,37 @@ describe("taskStore", () => {
     expect(loadStore().tasks[0].alarm.monthlyAnchorDay).toBe(31);
   });
 });
+
+describe("task CLI domain integration", () => {
+  it("uses domain validation for invalid real dates", async () => {
+    // @ts-expect-error CLI is an ESM script outside the TypeScript source tree.
+    const { createTaskFromCliArgs } = await import("../../scripts/task-cli.mjs");
+
+    expect(() =>
+      createTaskFromCliArgs(
+        {
+          title: "bad",
+          date: "2026-02-31",
+        },
+        fixedCreateOptions,
+      ),
+    ).toThrow("Task date must be a valid YYYY-MM-DD date");
+  });
+
+  it("uses domain monthly anchor calculation", async () => {
+    // @ts-expect-error CLI is an ESM script outside the TypeScript source tree.
+    const { createTaskFromCliArgs } = await import("../../scripts/task-cli.mjs");
+
+    const task = createTaskFromCliArgs(
+      {
+        title: "Monthly billing",
+        date: "2026-01-31",
+        time: "09:00",
+        repeat: "monthly",
+      },
+      fixedCreateOptions,
+    );
+
+    expect(task.alarm.monthlyAnchorDay).toBe(31);
+  });
+});

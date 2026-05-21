@@ -1,24 +1,7 @@
-import { randomUUID } from "node:crypto";
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-
-export const repeatRules = ["once", "daily", "weekdays", "weekly", "monthly", "until-completed"];
-
-const repeatLabels = {
-  "\u0031\ud68c": "once",
-  once: "once",
-  "\ub9e4\uc77c": "daily",
-  daily: "daily",
-  "\ud3c9\uc77c": "weekdays",
-  weekdays: "weekdays",
-  "\ub9e4\uc8fc": "weekly",
-  weekly: "weekly",
-  "\ub9e4\uc6d4": "monthly",
-  monthly: "monthly",
-  "\uc644\ub8cc\ud560 \ub54c\uae4c\uc9c0 \ubc18\ubcf5": "until-completed",
-  "until-completed": "until-completed",
-};
+import { createTask } from "../src/domain/task.ts";
 
 export const defaultData = {
   tasks: [],
@@ -29,7 +12,6 @@ export const defaultData = {
   },
 };
 
-const timePattern = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 export const dataPath = path.join(rootDir, "data", "tasks.json");
 
@@ -61,91 +43,46 @@ function todayString() {
   return `${year}-${month}-${day}`;
 }
 
-function normalizeDate(value) {
+function normalizeCliDate(value) {
   if (value === "today") {
     return todayString();
-  }
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-    throw new Error("Task date must be a valid YYYY-MM-DD date");
-  }
-
-  const parsed = new Date(`${value}T00:00:00.000Z`);
-  if (Number.isNaN(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== value) {
-    throw new Error("Task date must be a valid YYYY-MM-DD date");
   }
   return value;
 }
 
-function normalizeRepeatRule(value = "once") {
-  const repeat = repeatLabels[value.trim().toLowerCase()];
-  if (!repeat) {
-    throw new Error(`Invalid repeat rule: ${value}`);
-  }
-  return repeat;
-}
-
-function validateTime(value, message) {
-  if (value !== undefined && !timePattern.test(value)) {
-    throw new Error(message);
-  }
-}
-
-function normalizeMonthlyAnchorDay(value) {
+function parseIntegerOption(value) {
   if (value === undefined) {
     return undefined;
   }
 
-  const monthlyAnchorDay = Number(value);
-  if (
-    !Number.isFinite(monthlyAnchorDay) ||
-    !Number.isInteger(monthlyAnchorDay) ||
-    monthlyAnchorDay < 1 ||
-    monthlyAnchorDay > 31
-  ) {
-    throw new Error("Monthly anchor day must be an integer from 1 to 31");
-  }
-  return monthlyAnchorDay;
+  const numberValue = Number(value);
+  return Number.isInteger(numberValue) ? numberValue : value;
 }
 
-export function createCliTask(input, options = {}) {
-  const title = input.title?.trim() ?? "";
-  if (!title) {
-    throw new Error("Task title is required");
-  }
-
-  const date = normalizeDate(input.date ?? "today");
-  validateTime(input.time, "Task time must use HH:mm");
-
-  const alarmTime = input.alarmTime ?? input.time;
-  validateTime(input.alarmTime, "Alarm time must use HH:mm");
-
-  const repeat = normalizeRepeatRule(input.repeat);
-  const inputMonthlyAnchorDay = normalizeMonthlyAnchorDay(input.monthlyAnchorDay);
-  const monthlyAnchorDay =
-    repeat === "monthly" && alarmTime
-      ? (inputMonthlyAnchorDay ?? Number(date.slice(8, 10)))
-      : undefined;
-
-  const timestamp = (options.now ?? new Date()).toISOString();
-  return {
-    id: options.generateId?.() ?? randomUUID(),
-    title,
-    notes: input.notes?.trim() ?? "",
-    status: "active",
-    date,
-    time: input.time,
-    priority: "normal",
-    source: "codex",
-    createdAt: timestamp,
-    updatedAt: timestamp,
-    alarm: {
-      enabled: Boolean(alarmTime),
-      time: alarmTime,
-      repeat,
-      advanceMinutes: undefined,
-      monthlyAnchorDay,
+export function createTaskFromCliArgs(args, options = {}) {
+  const alarmTime = args.alarmTime ?? args.time;
+  return createTask(
+    {
+      title: args.title,
+      notes: args.notes,
+      date: normalizeCliDate(args.date ?? "today"),
+      time: args.time,
+      priority: args.priority,
+      source: "codex",
+      alarm: {
+        enabled: Boolean(alarmTime),
+        time: alarmTime,
+        repeat: args.repeat,
+        monthlyAnchorDay: parseIntegerOption(args.monthlyAnchorDay),
+        advanceMinutes: parseIntegerOption(args.advanceMinutes),
+      },
     },
-  };
+    options,
+  );
+}
+
+export function createCliTask(args, options = {}) {
+  return createTaskFromCliArgs(args, options);
 }
 
 export async function loadData(targetPath = dataPath) {
