@@ -13,16 +13,11 @@ function alarmOccurrenceDate(task: Task, now: Date): Date | undefined {
     return undefined;
   }
 
-  let occurrenceIso = task.alarm.lastFiredAt
-    ? nextOccurrenceAfter(task, task.alarm.lastFiredAt)
-    : combineDateAndTime(task.date, task.alarm.time);
-
-  if (!occurrenceIso) {
-    return undefined;
-  }
-
+  let occurrenceIso = combineDateAndTime(task.date, task.alarm.time);
   const advanceMs = (task.alarm.advanceMinutes ?? 0) * 60_000;
   const staleBefore = now.getTime() - dueWindowMs;
+  const parsedLastFiredAt = task.alarm.lastFiredAt ? new Date(task.alarm.lastFiredAt).getTime() : undefined;
+  const lastFiredAt = parsedLastFiredAt !== undefined && !Number.isNaN(parsedLastFiredAt) ? parsedLastFiredAt : undefined;
 
   for (let index = 0; index < maxOccurrenceAdvances; index += 1) {
     const occurrence = new Date(occurrenceIso);
@@ -30,11 +25,10 @@ function alarmOccurrenceDate(task: Task, now: Date): Date | undefined {
       return undefined;
     }
 
-    if (task.alarm.lastFiredAt && new Date(task.alarm.lastFiredAt).getTime() >= occurrence.getTime()) {
-      return undefined;
-    }
+    const dueTime = occurrence.getTime() - advanceMs;
+    const alreadyFired = lastFiredAt !== undefined && lastFiredAt >= dueTime;
 
-    if (occurrence.getTime() - advanceMs >= staleBefore || task.alarm.repeat === "once") {
+    if (!alreadyFired && (dueTime >= staleBefore || task.alarm.repeat === "once")) {
       return occurrence;
     }
 

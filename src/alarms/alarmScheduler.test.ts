@@ -70,6 +70,22 @@ describe("findDueAlarms", () => {
     expect(findDueAlarms([task], new Date("2026-05-21T17:30:00.000"))).toHaveLength(1);
   });
 
+  it("keeps advanced daily repeats anchored to the scheduled occurrence", () => {
+    const task = {
+      ...baseTask,
+      date: "2026-05-20",
+      alarm: {
+        ...baseTask.alarm,
+        repeat: "daily" as const,
+        advanceMinutes: 30,
+        lastFiredAt: new Date("2026-05-20T17:30:00.000").toISOString(),
+      },
+    };
+
+    expect(findDueAlarms([task], new Date("2026-05-21T17:00:00.000"))).toEqual([]);
+    expect(findDueAlarms([task], new Date("2026-05-21T17:30:00.000"))).toHaveLength(1);
+  });
+
   it("does not return alarms before they are due", () => {
     expect(findDueAlarms([baseTask], new Date("2026-05-21T17:59:30.000"))).toEqual([]);
   });
@@ -93,11 +109,11 @@ describe("findDueAlarms", () => {
       alarm: {
         ...baseTask.alarm,
         repeat: "daily" as const,
-        lastFiredAt: "2026-05-20T18:00:00.000Z",
+        lastFiredAt: new Date("2026-05-20T18:00:00.000").toISOString(),
       },
     };
 
-    expect(findDueAlarms([task], new Date("2026-05-21T18:00:00.000Z")).map((item) => item.id)).toEqual(["task-1"]);
+    expect(findDueAlarms([task], new Date("2026-05-21T18:00:00.000")).map((item) => item.id)).toEqual(["task-1"]);
   });
 
   it("uses daily cadence for until-completed repeats", () => {
@@ -107,11 +123,11 @@ describe("findDueAlarms", () => {
       alarm: {
         ...baseTask.alarm,
         repeat: "until-completed" as const,
-        lastFiredAt: "2026-05-20T18:00:00.000Z",
+        lastFiredAt: new Date("2026-05-20T18:00:00.000").toISOString(),
       },
     };
 
-    expect(findDueAlarms([task], new Date("2026-05-21T18:00:00.000Z"))).toHaveLength(1);
+    expect(findDueAlarms([task], new Date("2026-05-21T18:00:00.000"))).toHaveLength(1);
   });
 
   it("honors monthly anchor days when finding the next occurrence", () => {
@@ -124,11 +140,11 @@ describe("findDueAlarms", () => {
         time: "09:00",
         repeat: "monthly" as const,
         monthlyAnchorDay: 31,
-        lastFiredAt: "2026-02-28T09:00:00.000Z",
+        lastFiredAt: new Date("2026-02-28T09:00:00.000").toISOString(),
       },
     };
 
-    expect(findDueAlarms([task], new Date("2026-03-31T09:00:00.000Z"))).toHaveLength(1);
+    expect(findDueAlarms([task], new Date("2026-03-31T09:00:00.000"))).toHaveLength(1);
   });
 
   it("does not return old one-time alarms outside the one-minute window", () => {
